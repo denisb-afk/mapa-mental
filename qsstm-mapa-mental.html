@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QSSTM · Mapa mental da Qualidade</title>
+<style>
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap');
+
+:root{
+  --navy-950:#050d1f;
+  --navy-900:#081a36;
+  --navy-800:#0c2748;
+  --blue-700:#0c3a86;
+  --blue-500:#0f62c9;
+  --blue-300:#4fa6ee;
+  --cyan-400:#3fd0e0;
+  --green-500:#3fae52;
+  --green-400:#63c96f;
+  --amber-500:#f5a623;
+  --amber-400:#ffc857;
+  --white:#f6f8fb;
+  --gray-300:#aab6cc;
+  --gray-500:#7887a3;
+  --font-display:'Space Grotesk', sans-serif;
+  --font-body:'Inter', sans-serif;
+  --font-mono:'IBM Plex Mono', monospace;
+  --ease: cubic-bezier(.4,0,.2,1);
+}
+
+*{box-sizing:border-box;}
+html,body{margin:0; padding:0; height:100%;}
+body{
+  background:var(--navy-950);
+  color:var(--white);
+  font-family:var(--font-body);
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+a{color:inherit; text-decoration:none;}
+h1,h2{font-family:var(--font-display); margin:0; font-weight:600;}
+
+/* fundo ambiente */
+.grid-field{
+  position:fixed; inset:0; z-index:0; pointer-events:none;
+  background-image:
+    linear-gradient(rgba(79,166,238,.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(79,166,238,.06) 1px, transparent 1px);
+  background-size:60px 60px;
+}
+.grid-field::after{
+  content:""; position:absolute; inset:0;
+  background:radial-gradient(ellipse at 18% 12%, rgba(15,98,201,.22), transparent 55%),
+             radial-gradient(ellipse at 84% 90%, rgba(63,174,82,.14), transparent 55%);
+}
+
+/* ===== telas (no máximo 2, alternadas por :target) ===== */
+.screen{
+  display:none;
+  position:relative; z-index:1;
+  min-height:100vh;
+  width:100%;
+  padding:56px 6vw 40px;
+}
+#mapa{display:block;}
+body:has(.screen:target) #mapa{display:none;}
+.screen:target{display:block;}
+
+.screen-inner{max-width:1200px; margin:0 auto; animation:rise .6s var(--ease) both;}
+@keyframes rise{from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);}}
+
+/* cabeçalho comum */
+.top{
+  display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:16px;
+  margin-bottom:20px;
+}
+.brand{
+  font-family:var(--font-mono); font-weight:600; font-size:13px; letter-spacing:.14em;
+  display:flex; align-items:center; gap:8px; color:var(--gray-300);
+}
+.brand .dot{width:7px; height:7px; border-radius:50%; background:var(--amber-400); box-shadow:0 0 8px var(--amber-400);}
+.title-block{text-align:center; margin:0 auto 6px;}
+.eyebrow{
+  font-family:var(--font-mono); font-size:11.5px; letter-spacing:.3em; text-transform:uppercase; color:var(--cyan-400);
+}
+.title-block h1{font-size:clamp(30px,4.4vw,46px); margin-top:10px;
+  background:linear-gradient(180deg,#fff 30%, var(--blue-300) 100%);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.title-block p{color:var(--gray-300); font-size:14.5px; margin-top:10px; max-width:520px; margin-left:auto; margin-right:auto;}
+
+.link-pill{
+  font-family:var(--font-mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase;
+  border:1px solid rgba(63,208,224,.4); color:var(--cyan-400);
+  padding:10px 18px; border-radius:2px;
+  transition:background .2s var(--ease), color .2s var(--ease);
+  white-space:nowrap;
+}
+.link-pill:hover{background:rgba(63,208,224,.1); color:var(--white);}
+
+/* ===================================================================
+   TELA 1 — MAPA MENTAL
+   =================================================================== */
+.map-wrap{
+  position:relative;
+  width:min(680px, 92vw); height:min(680px, 92vw);
+  margin:26px auto 0;
+}
+.map-wrap svg{position:absolute; inset:0; width:100%; height:100%;}
+.map-connector{
+  fill:none; stroke:rgba(79,166,238,.4); stroke-width:.5;
+}
+.map-connector.pulse{
+  stroke:var(--blue-300); stroke-width:.6; stroke-dasharray:2 5;
+  animation:flow 4.5s linear infinite;
+}
+@keyframes flow{ to{stroke-dashoffset:-70;} }
+
+.ring{
+  position:absolute; inset:8%; border-radius:50%;
+  border:1px dashed rgba(63,208,224,.22);
+  animation:spin 70s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+.core{
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  width:168px; height:168px; border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, var(--blue-500), var(--navy-800) 72%);
+  border:1px solid rgba(79,166,238,.55);
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--font-display); font-weight:700; font-size:19px; letter-spacing:.02em;
+  box-shadow:0 0 60px -8px rgba(15,98,201,.75), inset 0 0 26px rgba(63,208,224,.2);
+  cursor:pointer; text-align:center; z-index:2;
+}
+.core input{position:absolute; opacity:0; pointer-events:none;}
+.core-label{position:relative; z-index:1;}
+
+.node{
+  position:absolute;
+  width:148px;
+  z-index:2;
+}
+.node input{position:absolute; opacity:0; pointer-events:none;}
+.node label{
+  display:block; text-align:center; cursor:pointer;
+  font-family:var(--font-mono); font-size:11.5px; letter-spacing:.06em; text-transform:uppercase;
+  padding:13px 10px;
+  border:1px solid rgba(170,182,204,.35);
+  background:rgba(8,26,54,.88);
+  border-radius:2px;
+  transition:all .2s var(--ease);
+}
+.node input:checked ~ label{
+  border-color:var(--amber-400); color:var(--amber-400);
+  background:rgba(245,166,35,.09);
+  box-shadow:0 0 22px -6px rgba(245,166,35,.6);
+}
+
+.node:nth-of-type(1){ top:2%;  left:50%; transform:translateX(-50%); }
+.node:nth-of-type(2){ top:23%; left:88%; transform:translate(-50%,-50%); }
+.node:nth-of-type(3){ top:71%; left:88%; transform:translate(-50%,-50%); }
+.node:nth-of-type(4){ top:96%; left:50%; transform:translate(-50%,-100%); }
+.node:nth-of-type(5){ top:71%; left:12%; transform:translate(-50%,-50%); }
+.node:nth-of-type(6){ top:23%; left:12%; transform:translate(-50%,-50%); }
+
+/* painel de descrição */
+.desc-panel{
+  max-width:600px; margin:34px auto 0;
+  min-height:96px;
+  text-align:center;
+}
+.desc-hint{color:var(--gray-500); font-size:13.5px; font-family:var(--font-mono); letter-spacing:.04em;}
+.desc-item{display:none; animation:rise .45s var(--ease) both;}
+.desc-item .tag{font-family:var(--font-mono); font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--amber-400);}
+.desc-item p{font-family:var(--font-display); font-weight:500; font-size:18.5px; line-height:1.55; color:var(--white); margin-top:10px;}
+
+/* exibe a descrição correspondente ao nó selecionado, via :has() no body */
+body:has(#n-processos:checked) #d-processos{display:block;}
+body:has(#n-eficiencia:checked) #d-eficiencia{display:block;}
+body:has(#n-pessoas:checked) #d-pessoas{display:block;}
+body:has(#n-inovacao:checked) #d-inovacao{display:block;}
+body:has(#n-melhoria:checked) #d-melhoria{display:block;}
+body:has(#n-resultados:checked) #d-resultados{display:block;}
+body:has(#n-core:checked) #d-core{display:block;}
+body:has(.node input:checked) .desc-hint,
+body:has(#n-core:checked) .desc-hint{display:none;}
+
+.quote-line{
+  max-width:640px; margin:52px auto 0; text-align:center;
+  font-family:var(--font-display); font-size:clamp(17px,2vw,21px); font-weight:500; line-height:1.6;
+  color:var(--gray-300);
+}
+.quote-line .em{color:var(--green-400);}
+
+.bottom-link{text-align:center; margin-top:34px;}
+
+/* ===================================================================
+   TELA 2 — CONEXÃO COM A EDP
+   =================================================================== */
+.edp-chain{
+  display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:0;
+  margin-top:40px;
+}
+.edp-stage{
+  font-family:var(--font-mono); font-size:12px; letter-spacing:.08em; text-transform:uppercase;
+  padding:20px 26px; border:1px solid rgba(170,182,204,.3); background:rgba(255,255,255,.02);
+  min-width:150px; text-align:center;
+}
+.edp-sep{width:30px; height:1px; background:var(--blue-300); position:relative;}
+.edp-sep::after{content:"";position:absolute; right:-1px; top:-3px; width:0; height:0; border-top:3.5px solid transparent; border-bottom:3.5px solid transparent; border-left:6px solid var(--blue-300);}
+.edp-layer{
+  height:44px; margin-top:0;
+  border:1px solid rgba(63,174,82,.5);
+  background:repeating-linear-gradient(90deg, rgba(99,201,111,.18) 0 24px, rgba(99,201,111,.08) 24px 48px);
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--font-mono); font-size:12px; letter-spacing:.3em; color:var(--green-400); text-transform:uppercase;
+}
+.edp-text{
+  max-width:640px; margin:30px auto 0; text-align:center;
+  color:var(--gray-300); font-size:15px; line-height:1.8;
+}
+.edp-note{
+  margin:26px auto 0; padding:16px 20px; border-left:2px solid var(--amber-400);
+  background:rgba(245,166,35,.05); max-width:640px;
+  font-size:13.5px; color:var(--gray-300); line-height:1.7;
+}
+.edp-note strong{color:var(--amber-400); font-weight:600;}
+
+@media(max-width:760px){
+  .node{width:118px;}
+  .node label{font-size:10px; padding:10px 6px;}
+  .core{width:132px; height:132px; font-size:16px;}
+  .edp-stage{min-width:120px; padding:15px;}
+}
+@media(prefers-reduced-motion: reduce){
+  *{animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important;}
+}
+a:focus-visible, label:focus-within{outline:1.5px solid var(--cyan-400); outline-offset:3px;}
+</style>
+</head>
+<body>
+
+<div class="grid-field" aria-hidden="true"></div>
+
+<!-- ============================================================
+     TELA 1 — MAPA MENTAL DA QUALIDADE
+     ============================================================ -->
+<section class="screen" id="mapa">
+  <div class="screen-inner">
+
+    <div class="top">
+      <div class="brand"><span class="dot"></span> QSSTM</div>
+      <a class="link-pill" href="#edp">Qualidade na EDP →</a>
+    </div>
+
+    <div class="title-block">
+      <div class="eyebrow">Mapa mental</div>
+      <h1>A energia da qualidade</h1>
+      <p>Toque no centro ou em cada ramo para ver como a qualidade se conecta à organização.</p>
+    </div>
+
+    <div class="map-wrap">
+      <svg viewBox="0 0 100 100" aria-hidden="true">
+        <line class="map-connector pulse" x1="50" y1="50" x2="50" y2="10"/>
+        <line class="map-connector pulse" x1="50" y1="50" x2="83.5" y2="27.5"/>
+        <line class="map-connector pulse" x1="50" y1="50" x2="83.5" y2="72.5"/>
+        <line class="map-connector pulse" x1="50" y1="50" x2="50" y2="90"/>
+        <line class="map-connector pulse" x1="50" y1="50" x2="16.5" y2="72.5"/>
+        <line class="map-connector pulse" x1="50" y1="50" x2="16.5" y2="27.5"/>
+      </svg>
+      <div class="ring" aria-hidden="true"></div>
+
+      <label class="core">
+        <input type="radio" name="mapnode" id="n-core">
+        <span class="core-label">QUALIDADE</span>
+      </label>
+
+      <div class="node">
+        <input type="radio" name="mapnode" id="n-processos">
+        <label for="n-processos">Processos</label>
+      </div>
+      <div class="node">
+        <input type="radio" name="mapnode" id="n-eficiencia">
+        <label for="n-eficiencia">Eficiência</label>
+      </div>
+      <div class="node">
+        <input type="radio" name="mapnode" id="n-pessoas">
+        <label for="n-pessoas">Pessoas</label>
+      </div>
+      <div class="node">
+        <input type="radio" name="mapnode" id="n-inovacao">
+        <label for="n-inovacao">Inovação</label>
+      </div>
+      <div class="node">
+        <input type="radio" name="mapnode" id="n-melhoria">
+        <label for="n-melhoria">Melhoria contínua</label>
+      </div>
+      <div class="node">
+        <input type="radio" name="mapnode" id="n-resultados">
+        <label for="n-resultados">Resultados</label>
+      </div>
+    </div>
+
+    <div class="desc-panel">
+      <p class="desc-hint">Selecione um elemento do mapa</p>
+      <div class="desc-item" id="d-core">
+        <div class="tag">Qualidade</div>
+        <p>Como uma energia, a qualidade percorre toda a organização — conectando processos, pessoas e resultados.</p>
+      </div>
+      <div class="desc-item" id="d-processos">
+        <div class="tag">Processos</div>
+        <p>Processos bem definidos ajudam a garantir que as atividades sejam realizadas de forma correta e padronizada.</p>
+      </div>
+      <div class="desc-item" id="d-eficiencia">
+        <div class="tag">Eficiência</div>
+        <p>Menos erros e desperdícios permitem utilizar melhor os recursos disponíveis.</p>
+      </div>
+      <div class="desc-item" id="d-pessoas">
+        <div class="tag">Pessoas</div>
+        <p>A qualidade depende de pessoas preparadas, envolvidas e comprometidas com os resultados.</p>
+      </div>
+      <div class="desc-item" id="d-inovacao">
+        <div class="tag">Inovação</div>
+        <p>A busca por melhorias estimula novas soluções e formas mais eficientes de realizar as atividades.</p>
+      </div>
+      <div class="desc-item" id="d-melhoria">
+        <div class="tag">Melhoria contínua</div>
+        <p>A qualidade não termina quando um problema é resolvido — o processo deve continuar sendo aperfeiçoado.</p>
+      </div>
+      <div class="desc-item" id="d-resultados">
+        <div class="tag">Resultados</div>
+        <p>Processos mais eficientes e pessoas mais engajadas se traduzem em melhores resultados para a operação e para o cliente.</p>
+      </div>
+    </div>
+
+    <p class="quote-line">"Qualidade não é apenas corrigir problemas. É <span class="em">melhorar continuamente</span> a forma como fazemos as coisas."</p>
+
+  </div>
+</section>
+
+<!-- ============================================================
+     TELA 2 — CONEXÃO COM A EDP
+     ============================================================ -->
+<section class="screen" id="edp">
+  <div class="screen-inner">
+
+    <div class="top">
+      <a class="link-pill" href="#mapa">← Mapa mental</a>
+      <div class="brand"><span class="dot"></span> QSSTM</div>
+    </div>
+
+    <div class="title-block">
+      <div class="eyebrow">Cadeia de valor</div>
+      <h1>Qualidade na EDP</h1>
+    </div>
+
+    <div class="edp-chain">
+      <div class="edp-stage">Geração</div><div class="edp-sep"></div>
+      <div class="edp-stage">Transmissão</div><div class="edp-sep"></div>
+      <div class="edp-stage">Distribuição</div><div class="edp-sep"></div>
+      <div class="edp-stage">Cliente</div>
+    </div>
+    <div class="edp-layer">Qualidade</div>
+
+    <p class="edp-text">No contexto de uma empresa de energia, a qualidade pode ser compreendida como um elemento presente em toda a cadeia de processos, contribuindo para eficiência, melhoria contínua e melhores resultados.</p>
+
+    <div class="edp-note">
+      <strong>Nota acadêmica:</strong> esta representação não descreve procedimentos oficiais específicos da EDP. Trata-se de uma interpretação acadêmica dos conceitos de qualidade aplicados ao contexto de uma empresa de energia.
+    </div>
+
+  </div>
+</section>
+
+</body>
+</html>
